@@ -17,12 +17,39 @@
 			expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 	<mvc:annotation-driven />
-	<bean id="viewResolver"
-		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-		<property name="viewClass"
-			value="org.springframework.web.servlet.view.JstlView" />
-		<property name="prefix" value="/WEB-INF/jsp/" />
-		<property name="suffix" value=".jsp" />
+
+	<!-- 使 spring 解析 content type 为 application/json 的 header 请求 -->
+	<bean id="contentNegotiationManager"
+		  class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorParameter" value="true" />
+		<property name="parameterName" value="format" />
+		<property name="ignoreAcceptHeader" value="false" />
+		<property name="mediaTypes">
+			<value>
+				json=application/json
+				xml=application/xml
+			</value>
+		</property>
+		<property name="defaultContentType" value="text/html" />
+	</bean>
+
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name= "contentNegotiationManager" ref= "contentNegotiationManager"/>
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+					<property name="prefix" value="/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+			</list>
+		</property>
 	</bean>
 
 
